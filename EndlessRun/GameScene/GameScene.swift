@@ -53,8 +53,8 @@ class GameScene: SKScene{
     
     
     
-    
-    let player = SKSpriteNode(imageNamed: "player")
+    private var walkingPlayerFrames : [SKTexture] = []
+    var player = SKSpriteNode(imageNamed: "doc1")
     var scoreLabel = SKLabelNode()
     var ScoreInteger = 0
     var JumpEnded = true
@@ -67,7 +67,7 @@ class GameScene: SKScene{
     override func didMove(to view: SKView) {
         
         
-        
+        //1
         heart1.position = CGPoint(x: frame.minX+heart1.frame.width, y: frame.maxY-30)
         heart2.position = CGPoint(x: heart1.position.x+heart2.size.width+5, y: frame.maxY-30)
         heart3.position = CGPoint(x: heart2.position.x+heart1.size.width+5, y: frame.maxY-30)
@@ -76,20 +76,15 @@ class GameScene: SKScene{
         addChild(heart3)
         
         
+        //2
         
-        player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
-        player.physicsBody?.isDynamic = true // 2
-        player.physicsBody?.categoryBitMask = PhysicsCategory.player // 3
-        player.physicsBody?.contactTestBitMask = PhysicsCategory.monster // 4
-        player.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
-        player.zPosition = -5
-        // 2
         createBackground()
+        createScore()
+        createSky()
+        createGround()
         
         // 3
-        player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.3)
-        // 4
-        addChild(player)
+        
         
         run(SKAction.repeatForever(
             SKAction.sequence([
@@ -108,13 +103,12 @@ class GameScene: SKScene{
                 SKAction.wait(forDuration: TimeInterval(2.0), withRange: TimeInterval(2.0))
             ])
         ))
+        //4
         
-        createScore()
-        createSky()
-        createGround()
         physicsWorld.gravity = .zero
         physicsWorld.contactDelegate = self
-        
+        buildPlayer()
+        animatePlayer()
         /* Qui inizializzo la Musica*/
         //        let backgroundMusic = SKAudioNode(fileNamed: "background-music-aac.caf")
         //        backgroundMusic.autoplayLooped = true
@@ -131,6 +125,42 @@ class GameScene: SKScene{
         
         addChild(scoreLabel)
     }
+    
+    
+    
+    func buildPlayer(){
+        let playerAnimatedAtlas = SKTextureAtlas(named: "Pixeldoctor")
+        var walkFrames : [SKTexture] = []
+        let numImages = playerAnimatedAtlas.textureNames.count
+        for i in 1...numImages {
+            let playerTextureName = "doc\(i)"
+            walkFrames.append(playerAnimatedAtlas.textureNamed(playerTextureName))
+        }
+        walkingPlayerFrames = walkFrames
+        let firstFrameTexture = walkingPlayerFrames[0]
+        player = SKSpriteNode(texture: firstFrameTexture)
+        player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
+        player.physicsBody?.isDynamic = true // 2
+        player.physicsBody?.categoryBitMask = PhysicsCategory.player // 3
+        player.physicsBody?.contactTestBitMask = PhysicsCategory.monster // 4
+        player.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
+        player.zPosition = -5
+        player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.25)
+        // 4
+        addChild(player)
+        
+    }
+    
+    
+    func animatePlayer(){
+        player.run(SKAction.repeatForever(
+            SKAction.animate(with: walkingPlayerFrames,
+                             timePerFrame: 0.01,
+                             resize: false,
+                             restore: true)
+        ), withKey: "walkInPlacePlayer")
+    }
+    
     
     func createSky() {
         let topSky = SKSpriteNode(color: UIColor(hue: 0.55, saturation: 0.14, brightness: 0.77, alpha: 1), size: CGSize(width: frame.width, height: frame.height * 0.67))
@@ -278,7 +308,7 @@ class GameScene: SKScene{
         }
         let touchLocation = touch.location(in: self)
         let toiletPaper = SKSpriteNode(imageNamed: "toiletPaper")
-        if touchLocation.x < 200 && JumpEnded == true{
+        if  touchLocation.x < 200 && JumpEnded == true{
             // 2 - Set up initial location of projectile
             JumpEnded = false
             let jumpUpAction = SKAction.moveBy(x: 0, y: toiletPaper.size.height+50 ,duration:0.2)
@@ -380,14 +410,14 @@ class GameScene: SKScene{
                     guard let `self` = self else { return }
                     let reveal = SKTransition.push(with: .down, duration: 0.5)
                     let gameOverScene = GameOverScene(size: self.size, won: false)
-                     
+                    
                     
                     self.view?.presentScene(gameOverScene, transition: reveal)
                 }
-               if ScoreInteger > defaults.integer(forKey: "Score") {
-                   defaults.set(ScoreInteger, forKey: "Score")
-                                 
-               }
+                if ScoreInteger > defaults.integer(forKey: "Score") {
+                    defaults.set(ScoreInteger, forKey: "Score")
+                    
+                }
                 
                 player.run(loseAction)
                 
@@ -417,15 +447,15 @@ class GameScene: SKScene{
                     guard let `self` = self else { return }
                     let reveal = SKTransition.push(with: .down, duration: 0.5)
                     let gameOverScene = GameOverScene(size: self.size, won: false)
-                   
+                    
                     self.view?.presentScene(gameOverScene, transition: reveal)
                     
                 }
                 if ScoreInteger > defaults.integer(forKey: "Score") {
                     defaults.set(ScoreInteger, forKey: "Score")
-                                  
+                    
                 }
-              
+                
                 
                 
                 player.run(loseAction)

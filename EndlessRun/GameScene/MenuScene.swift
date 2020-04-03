@@ -29,7 +29,7 @@ class MenuScene : SKScene {
         Titolo.text = "Toilet Paper Adventure"
         Donate.text = "Donate"
         Play.text = "Play"
-        scoreLabel.text = "MAX SCORE : \(defaults.integer(forKey: "score"))"
+        scoreLabel.text = "MAX SCORE : \(defaults.integer(forKey: "Score"))"
         
         Play.position = CGPoint(x: view.center.x, y: view.center.y+20)
         Titolo.position = CGPoint(x: view.center.x, y: view.center.y+110)

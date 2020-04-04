@@ -19,6 +19,8 @@
 		75B3BFDC242CC495002DDDE0 /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B3BFD9242CC495002DDDE0 /* GameOverScene.swift */; };
 		75B3BFE0242CC76F002DDDE0 /* background-music-aac.caf in Resources */ = {isa = PBXBuildFile; fileRef = 75B3BFDF242CC76F002DDDE0 /* background-music-aac.caf */; };
 		75B3BFE2242CC772002DDDE0 /* pew-pew-lei.caf in Resources */ = {isa = PBXBuildFile; fileRef = 75B3BFE1242CC772002DDDE0 /* pew-pew-lei.caf */; };
+		75EC870F243877700051A154 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75EC870E243877700051A154 /* Utilities.swift */; };
+		75EC8711243877960051A154 /* PlayerChoiceScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75EC8710243877960051A154 /* PlayerChoiceScene.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +38,8 @@
 		75B3BFD9242CC495002DDDE0 /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
 		75B3BFDF242CC76F002DDDE0 /* background-music-aac.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "background-music-aac.caf"; sourceTree = "<group>"; };
 		75B3BFE1242CC772002DDDE0 /* pew-pew-lei.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pew-pew-lei.caf"; sourceTree = "<group>"; };
+		75EC870E243877700051A154 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		75EC8710243877960051A154 /* PlayerChoiceScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerChoiceScene.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,8 @@
 				75B3BFD9242CC495002DDDE0 /* GameOverScene.swift */,
 				75B3BFD7242CC495002DDDE0 /* GameScene.swift */,
 				75B3BFD8242CC495002DDDE0 /* GameViewController.swift */,
+				75EC870E243877700051A154 /* Utilities.swift */,
+				75EC8710243877960051A154 /* PlayerChoiceScene.swift */,
 			);
 			path = GameScene;
 			sourceTree = "<group>";
@@ -176,6 +182,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				75EC870F243877700051A154 /* Utilities.swift in Sources */,
+				75EC8711243877960051A154 /* PlayerChoiceScene.swift in Sources */,
 				75B3BFDA242CC495002DDDE0 /* GameScene.swift in Sources */,
 				750430472433D54B00A5F810 /* MenuScene.swift in Sources */,
 				75B3BFDB242CC495002DDDE0 /* GameViewController.swift in Sources */,

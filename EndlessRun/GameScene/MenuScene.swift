@@ -19,22 +19,26 @@ class MenuScene : SKScene {
     var Play : SKLabelNode!
     var scoreLabel : SKLabelNode!
     weak var ViewController: UIViewController?
-    
+    var SetCHarachters : SKLabelNode!
     override func didMove(to view: SKView) {
         backgroundColor = .white
         Titolo = SKLabelNode(fontNamed: "Chalkduster")
         Donate = SKLabelNode(fontNamed: "Chalkduster")
         Play = SKLabelNode(fontNamed: "Chalkduster")
         scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
+        SetCHarachters = SKLabelNode(fontNamed: "Chalkduster")
         Titolo.text = "Toilet Paper Adventure"
         Donate.text = "Donate"
         Play.text = "Play"
         scoreLabel.text = "MAX SCORE : \(defaults.integer(forKey: "Score"))"
+        SetCHarachters.text = "Set Characters"
         
-        Play.position = CGPoint(x: view.center.x, y: view.center.y+20)
+        Play.position = CGPoint(x: view.center.x-150, y: view.center.y+20)
         Titolo.position = CGPoint(x: view.center.x, y: view.center.y+110)
         Donate.position = CGPoint(x: view.center.x, y: view.center.y-90)
         scoreLabel.position = CGPoint(x: view.frame.maxX-90, y: view.center.y+160)
+        SetCHarachters.position = CGPoint(x: frame.midX + 150, y: view.center.y+20)
+        SetCHarachters.fontSize = 25
         scoreLabel.fontSize = 18
         Titolo.fontSize = 40
         Donate.fontSize = 25
@@ -43,7 +47,7 @@ class MenuScene : SKScene {
         Titolo.fontColor = SKColor.black
         Donate.fontColor = SKColor.black
         Play.fontColor = SKColor.black
-       
+        SetCHarachters.fontColor = SKColor.black
         run(SKAction.repeatForever(
             SKAction.sequence([
                 SKAction.run(addMonster),
@@ -62,6 +66,7 @@ class MenuScene : SKScene {
                addChild(Play)
                addChild(Titolo)
                addChild(Donate)
+        addChild(SetCHarachters)
         
     }
     
@@ -164,7 +169,6 @@ class MenuScene : SKScene {
         
         if Play.contains(location!) {
             run(SKAction.sequence([
-                
                 SKAction.run() { [weak self] in
                     // 5
                     guard let `self` = self else { return }
@@ -174,6 +178,17 @@ class MenuScene : SKScene {
                 }
             ]))
             
+        }
+        if SetCHarachters.contains(location!) {
+            run(SKAction.sequence([
+                SKAction.run() { [weak self] in
+                    // 5
+                    guard let `self` = self else { return }
+                    let reveal = SKTransition.push(with: .up, duration: 0.5)
+                    let scene = PlayerChoiceScene(size: self.size)
+                    self.view?.presentScene(scene, transition:reveal)
+                }
+            ]))
         }
     }
     

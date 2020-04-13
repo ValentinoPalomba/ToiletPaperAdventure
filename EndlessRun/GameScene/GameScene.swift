@@ -60,12 +60,33 @@ class GameScene: SKScene{
     var JumpEnded = true
     var LifeCounter = 3
     weak var viewController : UIViewController?
-    
     let heart1 = SKSpriteNode(imageNamed: "hearth")
     let heart2 = SKSpriteNode(imageNamed: "hearth")
     let heart3 = SKSpriteNode(imageNamed: "hearth")
+    var counter = 0
+    var gameStateIsInGame = true
+    var minute = 0
+    
+    override func update(_ currentTime: TimeInterval) {
+        if gameStateIsInGame == true {
+            if counter >= 60 && minute <= 1 {
+            ScoreInteger = ScoreInteger + 1
+            counter = 0
+                minute = minute + 1
+                 self.scoreLabel.text = "SCORE : \(self.ScoreInteger)"
+            } else if counter >= 60 && minute >= 1 {
+            ScoreInteger = ScoreInteger + 5
+            counter = 0
+            minute = minute + 1
+            self.scoreLabel.text = "SCORE : \(self.ScoreInteger)"
+            } else{
+                counter = counter + 1
+            }
+    }
+    }
+
+    
     override func didMove(to view: SKView) {
-        
         
         //1
         heart1.position = CGPoint(x: frame.minX+heart1.frame.width, y: frame.maxY-30)
@@ -81,7 +102,7 @@ class GameScene: SKScene{
         createBackground()
         createScore()
         createSky()
-        createGround()
+//        createGround()
         
         // 3
         
@@ -92,8 +113,6 @@ class GameScene: SKScene{
                 SKAction.wait(forDuration: 1.0)
             ])
         ))
-        
-        
         
         
         run(SKAction.repeatForever(
@@ -275,24 +294,24 @@ class GameScene: SKScene{
     
     
     
-    func createGround() {
-        let groundTexture = SKTexture(imageNamed: "street1")
-        
-        for i in 0 ... 1 {
-            let ground = SKSpriteNode(texture: groundTexture)
-            ground.zPosition = -10
-            ground.position = CGPoint(x: (groundTexture.size().width / 2.0 + (groundTexture.size().width * CGFloat(i))), y: 30)
-            
-            addChild(ground)
-            
-            let moveLeft = SKAction.moveBy(x: -groundTexture.size().width, y: 0, duration: 10)
-            let moveReset = SKAction.moveBy(x: groundTexture.size().width, y: 0, duration: 0)
-            let moveLoop = SKAction.sequence([moveLeft, moveReset])
-            let moveForever = SKAction.repeatForever(moveLoop)
-            
-            ground.run(moveForever)
-        }
-    }
+//    func createGround() {
+//        let groundTexture = SKTexture(imageNamed: "street1")
+//
+//        for i in 0 ... 1 {
+//            let ground = SKSpriteNode(texture: groundTexture)
+//            ground.zPosition = -10
+//            ground.position = CGPoint(x: (groundTexture.size().width / 2.0 + (groundTexture.size().width * CGFloat(i))), y: 30)
+//
+//            addChild(ground)
+//
+//            let moveLeft = SKAction.moveBy(x: -groundTexture.size().width, y: 0, duration: 10)
+//            let moveReset = SKAction.moveBy(x: groundTexture.size().width, y: 0, duration: 0)
+//            let moveLoop = SKAction.sequence([moveLeft, moveReset])
+//            let moveForever = SKAction.repeatForever(moveLoop)
+//
+//            ground.run(moveForever)
+//        }
+//    }
     
     func createBackground() {
         let backgroundTexture = SKTexture(imageNamed: "hospital")
@@ -301,7 +320,7 @@ class GameScene: SKScene{
             let background = SKSpriteNode(texture: backgroundTexture)
             background.zPosition = -30
             background.anchorPoint = CGPoint.zero
-            background.position = CGPoint(x: (backgroundTexture.size().width * CGFloat(i)) - CGFloat(1 * i), y: 80)
+            background.position = CGPoint(x: (backgroundTexture.size().width * CGFloat(i)) - CGFloat(1 * i), y: 0)
             addChild(background)
             let moveLeft = SKAction.moveBy(x: -backgroundTexture.size().width, y: 0, duration: 10)
             let moveReset = SKAction.moveBy(x: backgroundTexture.size().width, y: 0, duration: 0)
@@ -320,12 +339,12 @@ class GameScene: SKScene{
         }
         let touchLocation = touch.location(in: self)
         let toiletPaper = SKSpriteNode(imageNamed: "toiletPaper")
-        if  touchLocation.x < 200 && JumpEnded == true && touchLocation.y < 200{
+        if  touchLocation.x < 400 && JumpEnded == true && touchLocation.y < 400{
             // 2 - Set up initial location of projectile
             JumpEnded = false
-            let jumpUpAction = SKAction.moveBy(x: 0, y: toiletPaper.size.height+50 ,duration:0.2)
+            let jumpUpAction = SKAction.moveBy(x: 0, y: toiletPaper.size.height+70 ,duration:0.3)
             // move down 20
-            let jumpDownAction = SKAction.moveBy(x: 0, y: -toiletPaper.size.height-50,duration:0.4)
+            let jumpDownAction = SKAction.moveBy(x: 0, y: -toiletPaper.size.height-70,duration:0.4)
             // sequence of move yup then down
             let EndJump = SKAction.run {
                 self.JumpEnded = true
@@ -402,7 +421,7 @@ class GameScene: SKScene{
                 addChild(explosion)
             }
             
-            ScoreInteger += 1
+            ScoreInteger += 10
             DispatchQueue.main.async {
                 self.scoreLabel.text = "SCORE : \(self.ScoreInteger)"
             }
@@ -516,7 +535,7 @@ extension GameScene: SKPhysicsContactDelegate {
                 projectileDidCollideWithMonster(projectile: projectile, monster: monster)
             }
         }
-        
+
     }
 }
 

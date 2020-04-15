@@ -66,7 +66,14 @@ class GameScene: SKScene{
     var counter = 0
     var gameStateIsInGame = true
     var minute = 0
-    
+    var gameSpeed:CGFloat = 0.5
+    var maxSpeed: Double = 0.0
+    var SpawnRange: CGFloat = 1.4
+    var previousScore = 20
+    var speedScore = 20
+   
+   
+//    points based on time
     override func update(_ currentTime: TimeInterval) {
         if gameStateIsInGame == true {
             if counter >= 60 && minute <= 1 {
@@ -85,8 +92,17 @@ class GameScene: SKScene{
     }
     }
 
+//    Game Speed
+    
+    
+    
+//    func ConfigureSpeed(){
+//        let movementSpeed = SKAction.speed(by: gameSpeed, duration: 0)
+//        run(movementSpeed)
+//    }
     
     override func didMove(to view: SKView) {
+        
         
         //1
         heart1.position = CGPoint(x: frame.minX+heart1.frame.width, y: frame.maxY-30)
@@ -110,7 +126,7 @@ class GameScene: SKScene{
         run(SKAction.repeatForever(
             SKAction.sequence([
                 SKAction.run(addMonster),
-                SKAction.wait(forDuration: 1.0)
+                SKAction.wait(forDuration: TimeInterval(SpawnRange))
             ])
         ))
         
@@ -119,7 +135,7 @@ class GameScene: SKScene{
             
             SKAction.sequence([
                 SKAction.run(addToiletPaper),
-                SKAction.wait(forDuration: TimeInterval(2.0), withRange: TimeInterval(2.0))
+                SKAction.wait(forDuration: TimeInterval(SpawnRange), withRange: 0.5)
             ])
         ))
         //4
@@ -127,7 +143,7 @@ class GameScene: SKScene{
         physicsWorld.gravity = .zero
         physicsWorld.contactDelegate = self
         buildPlayer()
-        
+       
         
         
 //        animatePlayer()
@@ -150,7 +166,24 @@ class GameScene: SKScene{
         
         addChild(scoreLabel)
     }
+
     
+    func changeSpeed(){
+       if maxSpeed <= 7.0 {
+    if ScoreInteger >= previousScore * 2 {
+                           gameSpeed += 0.3
+                           maxSpeed += 0.2
+                    previousScore = ScoreInteger
+                       print("SPEED\(self.gameSpeed)")
+                       print("MAX\(self.maxSpeed)")
+                           if SpawnRange >= 0.4 {
+                               SpawnRange -= 0.4
+                               print("SPAWN\(self.SpawnRange)")
+                           }
+                           
+                       }
+                   }
+               }
     
     
     func buildPlayer(){
@@ -235,23 +268,22 @@ class GameScene: SKScene{
         monster.physicsBody?.node?.name = "monster"
         monster.physicsBody?.contactTestBitMask = PhysicsCategory.projectile // 4
         monster.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
-        
         // Determine where to spawn the monster along the Y axis
         let actualY = random(min: monster.size.height/2, max: size.height - monster.size.height/2)
-        
+       
         // Position the monster slightly off-screen along the right edge,
         // and along a random position along the Y axis as calculated above
         monster.position = CGPoint(x: size.width + monster.size.width/2, y: actualY)
         
         // Add the monster to the scene
-        addChild(monster)
         
+        monster.speed = gameSpeed
         // Determine speed of the monster
-        let actualDuration = random(min: CGFloat(2.0), max: CGFloat(4.0))
+//        let actualDuration = random(min: CGFloat(2.0), max: CGFloat(4.0))
         
         // Create the actions
         let actionMove = SKAction.move(to: CGPoint(x: -monster.size.width/2, y: actualY),
-                                       duration: TimeInterval(actualDuration))
+                                       duration: TimeInterval(gameSpeed))
         
         //        let loseAction = SKAction.run() { [weak self] in
         //            guard let `self` = self else { return }
@@ -264,6 +296,7 @@ class GameScene: SKScene{
         let actionMoveDone = SKAction.removeFromParent()
         
         monster.run(SKAction.sequence([actionMove, actionMoveDone]))
+        addChild(monster)
     }
     
     
@@ -277,41 +310,18 @@ class GameScene: SKScene{
         toiletPaper.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
         
         toiletPaper.position = CGPoint(x: size.width + toiletPaper.size.width/2, y: toiletPaper.size.height/2+20)
-        
-        addChild(toiletPaper)
+        toiletPaper.speed = gameSpeed
         
         
         
         let actionMove = SKAction.move(to: CGPoint(x: -toiletPaper.size.width/2, y:toiletPaper.size.height/2+20),
-                                       duration: TimeInterval(2.0))
+                                       duration: TimeInterval(gameSpeed))
         
         let actionMoveDone = SKAction.removeFromParent()
         
         toiletPaper.run(SKAction.sequence([actionMove, actionMoveDone]))
-        
+        addChild(toiletPaper)
     }
-    
-    
-    
-    
-//    func createGround() {
-//        let groundTexture = SKTexture(imageNamed: "street1")
-//
-//        for i in 0 ... 1 {
-//            let ground = SKSpriteNode(texture: groundTexture)
-//            ground.zPosition = -10
-//            ground.position = CGPoint(x: (groundTexture.size().width / 2.0 + (groundTexture.size().width * CGFloat(i))), y: 30)
-//
-//            addChild(ground)
-//
-//            let moveLeft = SKAction.moveBy(x: -groundTexture.size().width, y: 0, duration: 10)
-//            let moveReset = SKAction.moveBy(x: groundTexture.size().width, y: 0, duration: 0)
-//            let moveLoop = SKAction.sequence([moveLeft, moveReset])
-//            let moveForever = SKAction.repeatForever(moveLoop)
-//
-//            ground.run(moveForever)
-//        }
-//    }
     
     func createBackground() {
         let backgroundTexture = SKTexture(imageNamed: "hospital")
@@ -326,7 +336,7 @@ class GameScene: SKScene{
             let moveReset = SKAction.moveBy(x: backgroundTexture.size().width, y: 0, duration: 0)
             let moveLoop = SKAction.sequence([moveLeft, moveReset])
             let moveForever = SKAction.repeatForever(moveLoop)
-            
+        
             background.run(moveForever)
         }
         
@@ -342,9 +352,9 @@ class GameScene: SKScene{
         if  touchLocation.x < 400 && JumpEnded == true && touchLocation.y < 400{
             // 2 - Set up initial location of projectile
             JumpEnded = false
-            let jumpUpAction = SKAction.moveBy(x: 0, y: toiletPaper.size.height+70 ,duration:0.3)
+            let jumpUpAction = SKAction.moveBy(x: 0, y: toiletPaper.size.height+80 ,duration:0.3)
             // move down 20
-            let jumpDownAction = SKAction.moveBy(x: 0, y: -toiletPaper.size.height-70,duration:0.4)
+            let jumpDownAction = SKAction.moveBy(x: 0, y: -toiletPaper.size.height-80,duration:0.4)
             // sequence of move yup then down
             let EndJump = SKAction.run {
                 self.JumpEnded = true
@@ -411,6 +421,8 @@ class GameScene: SKScene{
     
     
     
+    
+    
     func projectileDidCollideWithMonster(projectile: SKSpriteNode, monster: SKSpriteNode) {
         
         if projectile != player && monster.physicsBody?.node?.name == "monster" {
@@ -422,6 +434,7 @@ class GameScene: SKScene{
             }
             
             ScoreInteger += 10
+            changeSpeed()
             DispatchQueue.main.async {
                 self.scoreLabel.text = "SCORE : \(self.ScoreInteger)"
             }
@@ -538,4 +551,5 @@ extension GameScene: SKPhysicsContactDelegate {
 
     }
 }
+
 

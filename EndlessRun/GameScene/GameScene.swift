@@ -9,6 +9,7 @@ struct PhysicsCategory {
     static let monster    : UInt32 = 0b1       // 1
     static let projectile : UInt32 = 0b10      // 2
     static let player     : UInt32 = 0b11
+    static let invincibilityMask : UInt32 = 0b01
     
 }
 
@@ -71,6 +72,7 @@ class GameScene: SKScene{
     var SpawnRange: CGFloat = 1.4
     var previousScore = 20
     var speedScore = 20
+    private var invincibile = false
    
    
 //    points based on time
@@ -121,7 +123,12 @@ class GameScene: SKScene{
 //        createGround()
         
         // 3
-        
+        run(SKAction.repeatForever(
+            SKAction.sequence([
+                SKAction.run(addInvincibilityMask),
+                SKAction.wait(forDuration: TimeInterval(2.0),withRange: 0.5)
+            ])
+        ))
         
         run(SKAction.repeatForever(
             SKAction.sequence([
@@ -323,6 +330,25 @@ class GameScene: SKScene{
         addChild(toiletPaper)
     }
     
+    func addInvincibilityMask() {
+        let invincibilityMask = SKSpriteNode(imageNamed: "mask")
+        invincibilityMask.physicsBody = SKPhysicsBody(rectangleOf: invincibilityMask.size)
+        invincibilityMask.physicsBody?.isDynamic = true
+        invincibilityMask.physicsBody?.categoryBitMask = PhysicsCategory.invincibilityMask
+        invincibilityMask.physicsBody?.node?.name = "invincibilityMask"
+        invincibilityMask.physicsBody?.contactTestBitMask = PhysicsCategory.player // 4
+        invincibilityMask.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
+        let actualY = random(min: invincibilityMask.size.height/2, max: size.height - invincibilityMask.size.height/2)
+        invincibilityMask.position = CGPoint(x: size.width + invincibilityMask.size.width/2, y: actualY)
+        invincibilityMask.speed = gameSpeed
+        let actionMove = SKAction.move(to: CGPoint(x: -invincibilityMask.size.width/2, y: actualY),
+                                              duration: TimeInterval(gameSpeed))
+        let actionMoveDone = SKAction.removeFromParent()
+        invincibilityMask.run(SKAction.sequence([actionMove, actionMoveDone]))
+               addChild(invincibilityMask)
+        
+    }
+    
     func createBackground() {
         let backgroundTexture = SKTexture(imageNamed: "hospital")
         
@@ -418,12 +444,26 @@ class GameScene: SKScene{
     }
     
     
-    
-    
-    
-    
-    
     func projectileDidCollideWithMonster(projectile: SKSpriteNode, monster: SKSpriteNode) {
+        
+        if projectile == player && monster.physicsBody?.node!.name == "invincibilityMask" {
+                invincibile = true
+                let fadeOutAction = SKAction.fadeOut(withDuration: 0.4)
+                let fadeInAction = SKAction.fadeIn(withDuration: 0.4)
+            let fadeOutIn = SKAction.sequence([fadeOutAction,fadeInAction])
+                let fadeOutInAction = SKAction.repeat(fadeOutIn, count: 5)
+                let waitForNextAction = SKAction.wait(forDuration: TimeInterval(2.4))
+           
+                let setInvicibleFalse = SKAction.run(){
+                    self.invincibile = false
+            }
+                let sequence = SKAction.sequence([fadeOutInAction,waitForNextAction,setInvicibleFalse])
+            ScoreInteger += 50
+            player.run(sequence)
+            print("invincibility")
+            monster.removeFromParent()
+            
+        }
         
         if projectile != player && monster.physicsBody?.node?.name == "monster" {
             
@@ -448,6 +488,7 @@ class GameScene: SKScene{
             
             switch LifeCounter {
             case 1 :
+                if invincibile == false{
                 self.heart3.removeFromParent()
                 let loseAction = SKAction.run() { [weak self] in
                     guard let `self` = self else { return }
@@ -456,35 +497,49 @@ class GameScene: SKScene{
                     
                     
                     self.view?.presentScene(gameOverScene, transition: reveal)
-                }
+                    }
                 if ScoreInteger > defaults.integer(forKey: "Score") {
                     defaults.set(ScoreInteger, forKey: "Score")
                     
                 }
                 
                 player.run(loseAction)
+                }
+                else {
+                    monster.removeFromParent()
+                }
                 
                 //                viewController?.performSegue(withIdentifier: "Lose", sender: self)
                 
                 
                 break
             case 2 :
+                    if invincibile == false{
                 self.heart2.removeFromParent()
                 LifeCounter -= 1
+                    } else {
+                        monster.removeFromParent()
+                    }
             case 3 :
+                    if invincibile == false{
                 self.heart1.removeFromParent()
                 LifeCounter -= 1
+                } else {
+                    monster.removeFromParent()
+                }
             default :
                 print("NO LIFE")
             }
             monster.removeFromParent()
         }
             
+            
         else if projectile == player && monster.physicsBody?.node!.name == "monster" {
             print("Player hitted by \(String(describing: monster.physicsBody?.node?.name))")
             
             switch LifeCounter {
             case 1 :
+                if invincibile == false{
                 self.heart3.removeFromParent()
                 let loseAction = SKAction.run() { [weak self] in
                     guard let `self` = self else { return }
@@ -504,15 +559,26 @@ class GameScene: SKScene{
                 player.run(loseAction)
                 
                 //                viewController?.performSegue(withIdentifier: "Lose", sender: self)
-                
+                }
+                else {
+                    monster.removeFromParent()
+                }
                 
                 break
             case 2 :
+                if invincibile == false{
                 self.heart2.removeFromParent()
                 LifeCounter -= 1
+            }else {
+                monster.removeFromParent()
+            }
             case 3 :
+                if invincibile == false{
                 self.heart1.removeFromParent()
                 LifeCounter -= 1
+        }else {
+            monster.removeFromParent()
+        }
             default :
                 print("NO LIFE")
             }

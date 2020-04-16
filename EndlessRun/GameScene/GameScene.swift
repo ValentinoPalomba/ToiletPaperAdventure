@@ -55,7 +55,7 @@ class GameScene: SKScene{
     
     
     private var walkingPlayerFrames : [SKTexture] = []
-    var player = SKSpriteNode(imageNamed: "doc1")
+    var player = SKSpriteNode()
     var scoreLabel = SKLabelNode()
     var ScoreInteger = 0
     var JumpEnded = true
@@ -126,7 +126,7 @@ class GameScene: SKScene{
         run(SKAction.repeatForever(
             SKAction.sequence([
                 SKAction.run(addInvincibilityMask),
-                SKAction.wait(forDuration: TimeInterval(2.0),withRange: 0.5)
+                SKAction.wait(forDuration: TimeInterval(5.0),withRange: 3.0)
             ])
         ))
         
@@ -150,6 +150,7 @@ class GameScene: SKScene{
         physicsWorld.gravity = .zero
         physicsWorld.contactDelegate = self
         buildPlayer()
+        animatePlayer()
        
         
         
@@ -194,22 +195,22 @@ class GameScene: SKScene{
     
     
     func buildPlayer(){
-//        let playerAnimatedAtlas = SKTextureAtlas(named: "Pixeldoctor")
-//        var walkFrames : [SKTexture] = []
-//        let numImages = playerAnimatedAtlas.textureNames.count
-//        for i in 1...numImages {
-//            let playerTextureName = "doc\(i)"
-//            walkFrames.append(playerAnimatedAtlas.textureNamed(playerTextureName))
+        let playerAnimatedAtlas = SKTextureAtlas(named: "Pixeldoctor")
+        var walkFrames : [SKTexture] = []
+        let numImages = playerAnimatedAtlas.textureNames.count
+        for i in 1...numImages {
+            let playerTextureName = "doc\(i)"
+            walkFrames.append(playerAnimatedAtlas.textureNamed(playerTextureName))
+        }
+        walkingPlayerFrames = walkFrames
+        let firstFrameTexture = walkingPlayerFrames[0]
+        player = SKSpriteNode(texture: firstFrameTexture)
+//        if defaults.integer(forKey: "PlayerChoice") == 1 {
+//            player = SKSpriteNode(imageNamed: "Pizzaboy")
 //        }
-//        walkingPlayerFrames = walkFrames
-//        let firstFrameTexture = walkingPlayerFrames[0]
-//        player = SKSpriteNode(texture: firstFrameTexture)
-        if defaults.integer(forKey: "PlayerChoice") == 1 {
-            player = SKSpriteNode(imageNamed: "Pizzaboy")
-        }
-        if defaults.integer(forKey: "PlayerChoice") == 2 {
-            player = SKSpriteNode(imageNamed: "Kim")
-        }
+//        if defaults.integer(forKey: "PlayerChoice") == 2 {
+//            player = SKSpriteNode(imageNamed: "Kim")
+//        }
         player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
         player.physicsBody?.isDynamic = true // 2
         player.physicsBody?.categoryBitMask = PhysicsCategory.player // 3
@@ -226,7 +227,7 @@ class GameScene: SKScene{
     func animatePlayer(){
         player.run(SKAction.repeatForever(
             SKAction.animate(with: walkingPlayerFrames,
-                             timePerFrame: 0.01,
+                             timePerFrame: 0.2,
                              resize: false,
                              restore: true)
         ), withKey: "walkInPlacePlayer")
@@ -452,7 +453,7 @@ class GameScene: SKScene{
                 let fadeInAction = SKAction.fadeIn(withDuration: 0.4)
             let fadeOutIn = SKAction.sequence([fadeOutAction,fadeInAction])
                 let fadeOutInAction = SKAction.repeat(fadeOutIn, count: 5)
-                let waitForNextAction = SKAction.wait(forDuration: TimeInterval(2.4))
+                let waitForNextAction = SKAction.wait(forDuration: TimeInterval(2.2))
            
                 let setInvicibleFalse = SKAction.run(){
                     self.invincibile = false

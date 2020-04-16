@@ -10,6 +10,7 @@ struct PhysicsCategory {
     static let projectile : UInt32 = 0b10      // 2
     static let player     : UInt32 = 0b11
     static let invincibilityMask : UInt32 = 0b01
+    static let projectile2 : UInt32 = 0b11
     
 }
 
@@ -73,6 +74,10 @@ class GameScene: SKScene{
     var previousScore = 20
     var speedScore = 20
     private var invincibile = false
+//    proiettili
+    var siringa = true
+    var pizza = false
+    var sanitizer = false
    
    
 //    points based on time
@@ -104,6 +109,7 @@ class GameScene: SKScene{
 //    }
     
     override func didMove(to view: SKView) {
+        
         
         
         //1
@@ -147,7 +153,7 @@ class GameScene: SKScene{
         ))
         //4
         
-        physicsWorld.gravity = .zero
+        physicsWorld.gravity = .init(dx: 0, dy: -1)
         physicsWorld.contactDelegate = self
         buildPlayer()
         animatePlayer()
@@ -205,25 +211,19 @@ class GameScene: SKScene{
         walkingPlayerFrames = walkFrames
         let firstFrameTexture = walkingPlayerFrames[0]
         player = SKSpriteNode(texture: firstFrameTexture)
-//        if defaults.integer(forKey: "PlayerChoice") == 1 {
-//            player = SKSpriteNode(imageNamed: "Pizzaboy")
-//        }
-//        if defaults.integer(forKey: "PlayerChoice") == 2 {
-//            player = SKSpriteNode(imageNamed: "Kim")
-//        }
         player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
         player.physicsBody?.isDynamic = true // 2
         player.physicsBody?.categoryBitMask = PhysicsCategory.player // 3
         player.physicsBody?.contactTestBitMask = PhysicsCategory.monster // 4
         player.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
+        player.physicsBody?.affectedByGravity = false
         player.zPosition = -5
         player.position = CGPoint(x: size.width * 0.1, y: size.height * 0.25)
+        player.setScale(0.12)
         // 4
         addChild(player)
         
     }
-    
-    
     func animatePlayer(){
         player.run(SKAction.repeatForever(
             SKAction.animate(with: walkingPlayerFrames,
@@ -341,14 +341,83 @@ class GameScene: SKScene{
         invincibilityMask.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
         let actualY = random(min: invincibilityMask.size.height/2, max: size.height - invincibilityMask.size.height/2)
         invincibilityMask.position = CGPoint(x: size.width + invincibilityMask.size.width/2, y: actualY)
-        invincibilityMask.speed = gameSpeed
+        invincibilityMask.speed = 1
         let actionMove = SKAction.move(to: CGPoint(x: -invincibilityMask.size.width/2, y: actualY),
-                                              duration: TimeInterval(gameSpeed))
+                                              duration: TimeInterval(1))
         let actionMoveDone = SKAction.removeFromParent()
         invincibilityMask.run(SKAction.sequence([actionMove, actionMoveDone]))
                addChild(invincibilityMask)
         
     }
+//    add proiettili
+//    siringa
+    func AddSiringe() {
+        let siringe = SKSpriteNode(imageNamed: "siringe")
+        siringe.physicsBody = SKPhysicsBody(rectangleOf: siringe.size)
+//        siringe.physicsBody?.isDynamic = true
+        siringe.physicsBody?.categoryBitMask = PhysicsCategory.invincibilityMask
+        siringe.physicsBody?.node?.name = "siringe"
+        siringe.physicsBody?.contactTestBitMask = PhysicsCategory.player // 4
+        siringe.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
+        siringe.setScale(0.025)
+        siringe.physicsBody?.affectedByGravity = true
+        let fall = SKAction.moveTo(y: self.frame.height, duration: 0.08)
+        let waitTheFall = SKAction.wait(forDuration: 0.08)
+        let actualY = random(min: siringe.size.height/2, max: size.height - siringe.size.height/2)
+        siringe.position = CGPoint(x: size.width + siringe.size.width/2, y: actualY)
+        siringe.speed = 1
+        let actionMove = SKAction.move(to: CGPoint(x: -siringe.size.width/2, y: actualY),
+                                              duration: TimeInterval(1))
+        let actionMoveDone = SKAction.removeFromParent()
+        siringe.run(SKAction.sequence([fall,waitTheFall,actionMove, actionMoveDone]))
+               addChild(siringe)
+        }
+//    pizza
+    func AddPizza() {
+        let pizza = SKSpriteNode(imageNamed: "pizza")
+        pizza.physicsBody = SKPhysicsBody(rectangleOf: pizza.size)
+//        pizza.physicsBody?.isDynamic = true
+        pizza.physicsBody?.categoryBitMask = PhysicsCategory.projectile2
+        pizza.physicsBody?.node?.name = "pizza"
+        pizza.physicsBody?.contactTestBitMask = PhysicsCategory.player // 4
+        pizza.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
+        pizza.setScale(0.025)
+        pizza.physicsBody?.affectedByGravity = true
+        let fall = SKAction.moveTo(y: self.frame.height, duration: 0.08)
+        let waitTheFall = SKAction.wait(forDuration: 0.08)
+        let actualY = random(min: pizza.size.height/2, max: size.height - pizza.size.height/2)
+        pizza.position = CGPoint(x: size.width + pizza.size.width/2, y: actualY)
+        pizza.speed = 1
+        let actionMove = SKAction.move(to: CGPoint(x: -pizza.size.width/2, y: actualY),
+                                              duration: TimeInterval(1))
+        let actionMoveDone = SKAction.removeFromParent()
+        pizza.run(SKAction.sequence([fall,waitTheFall,actionMove, actionMoveDone]))
+               addChild(pizza)
+    }
+//    sanitizer
+    func AddSanitizer() {
+        let sanitizer = SKSpriteNode(imageNamed: "sanitizer")
+        sanitizer.physicsBody = SKPhysicsBody(rectangleOf: sanitizer.size)
+//        sanitizer.physicsBody?.isDynamic = true
+        sanitizer.physicsBody?.categoryBitMask = PhysicsCategory.projectile2
+        sanitizer.physicsBody?.node?.name = "sanitizer"
+        sanitizer.physicsBody?.contactTestBitMask = PhysicsCategory.player // 4
+        sanitizer.physicsBody?.collisionBitMask = PhysicsCategory.none // 5
+        sanitizer.setScale(0.025)
+        sanitizer.physicsBody?.affectedByGravity = true
+        let fall = SKAction.moveTo(y: self.frame.height , duration: 0.08)
+        let waitTheFall = SKAction.wait(forDuration: 0.08)
+        let actualY = random(min: sanitizer.size.height/2, max: size.height - sanitizer.size.height/2)
+        sanitizer.position = CGPoint(x: size.width + sanitizer.size.width/2, y: actualY)
+        sanitizer.speed = 1
+        let actionMove = SKAction.move(to: CGPoint(x: -sanitizer.size.width/2, y: actualY),
+                                              duration: TimeInterval(1))
+        let actionMoveDone = SKAction.removeFromParent()
+        sanitizer.run(SKAction.sequence([fall,waitTheFall,actionMove, actionMoveDone]))
+               addChild(sanitizer)
+    }
+    
+    
     
     func createBackground() {
         let backgroundTexture = SKTexture(imageNamed: "hospital")
@@ -396,25 +465,40 @@ class GameScene: SKScene{
         else {
                    
                    //            run(SKAction.playSoundFileNamed("pew-pew-lei.caf", waitForCompletion: false))
-            var projectile = SKSpriteNode(imageNamed: "projectile")
-            if defaults.integer(forKey: "PlayerChoice") == 0{
-                projectile = SKSpriteNode(imageNamed: "projectile")
+            var projectile = SKSpriteNode(imageNamed: "siringe")
+            if siringa == true {
+                projectile = SKSpriteNode(imageNamed: "siringe")
+                projectile.physicsBody = SKPhysicsBody(rectangleOf: projectile.size)
+                                  projectile.physicsBody?.isDynamic = true
+                                  projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile
+                                  projectile.physicsBody?.contactTestBitMask = PhysicsCategory.monster
+                                  projectile.physicsBody?.collisionBitMask = PhysicsCategory.none
+                                  projectile.physicsBody?.usesPreciseCollisionDetection = true
+                                  projectile.setScale(0.025)
+                projectile.zRotation = .pi / -2
             }
-            if defaults.integer(forKey: "PlayerChoice") == 1{
-                projectile = SKSpriteNode(imageNamed: "pizzaProjectile")
+            if pizza == true {
+                projectile = SKSpriteNode(imageNamed: "pizza")
+                projectile.physicsBody = SKPhysicsBody(rectangleOf: projectile.size)
+                                  projectile.physicsBody?.isDynamic = true
+                                  projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile
+                                  projectile.physicsBody?.contactTestBitMask = PhysicsCategory.monster
+                                  projectile.physicsBody?.collisionBitMask = PhysicsCategory.none
+                                  projectile.physicsBody?.usesPreciseCollisionDetection = true
+                                  projectile.setScale(0.03)
             }
-            if defaults.integer(forKey: "PlayerChoice") == 2{
-                projectile = SKSpriteNode(imageNamed: "bomb")
+            if sanitizer == true {
+                projectile = SKSpriteNode(imageNamed: "sanitizer")
+                projectile.physicsBody = SKPhysicsBody(rectangleOf: projectile.size)
+                                  projectile.physicsBody?.isDynamic = true
+                                  projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile
+                                  projectile.physicsBody?.contactTestBitMask = PhysicsCategory.monster
+                                  projectile.physicsBody?.collisionBitMask = PhysicsCategory.none
+                                  projectile.physicsBody?.usesPreciseCollisionDetection = true
+                                  projectile.setScale(0.015)
             }
                   
                    projectile.position = player.position
-                   
-                   projectile.physicsBody = SKPhysicsBody(circleOfRadius: projectile.size.width/2)
-                   projectile.physicsBody?.isDynamic = true
-                   projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile
-                   projectile.physicsBody?.contactTestBitMask = PhysicsCategory.monster
-                   projectile.physicsBody?.collisionBitMask = PhysicsCategory.none
-                   projectile.physicsBody?.usesPreciseCollisionDetection = true
                    
                    // 3 - Determine offset of location to projectile
                    let offset = touchLocation - projectile.position
@@ -443,17 +527,67 @@ class GameScene: SKScene{
                }
         
     }
+    func randomWeaponSpawn(position: CGPoint) {
+         switch (arc4random_uniform(3)) {
+
+           case 0:
+                
+               AddSiringe()
+               
+
+           case 1:
+
+               AddPizza()
+
+           case 2:
+
+               AddSanitizer()
+
+           default:
+               return
+           }
+
+    
+    }
     
     
     func projectileDidCollideWithMonster(projectile: SKSpriteNode, monster: SKSpriteNode) {
         
+//        proiettili
+//        siringa
+        if projectile == player && monster.physicsBody?.node!.name == "siringe" {
+            if siringa != true {
+                siringa = true
+                pizza = false
+                sanitizer = false
+            }
+        }
+//        pizza
+        if projectile == player && monster.physicsBody?.node!.name == "pizza" {
+            if pizza != true {
+                siringa = false
+                pizza = true
+                sanitizer = false
+          }
+        }
+//        sanitizer
+        if projectile == player && monster.physicsBody?.node!.name == "sanitizer" {
+            if sanitizer != true {
+                siringa = false
+                pizza = false
+                sanitizer = true
+          }
+        }
+        
+        
+//        invincibilità
         if projectile == player && monster.physicsBody?.node!.name == "invincibilityMask" {
                 invincibile = true
                 let fadeOutAction = SKAction.fadeOut(withDuration: 0.4)
                 let fadeInAction = SKAction.fadeIn(withDuration: 0.4)
             let fadeOutIn = SKAction.sequence([fadeOutAction,fadeInAction])
                 let fadeOutInAction = SKAction.repeat(fadeOutIn, count: 5)
-                let waitForNextAction = SKAction.wait(forDuration: TimeInterval(2.2))
+                let waitForNextAction = SKAction.wait(forDuration: TimeInterval(2.1))
            
                 let setInvicibleFalse = SKAction.run(){
                     self.invincibile = false
@@ -472,6 +606,7 @@ class GameScene: SKScene{
                 print("esplosione")
                 explosion.position = monster.position
                 addChild(explosion)
+                randomWeaponSpawn(position: monster.position)
             }
             
             ScoreInteger += 10

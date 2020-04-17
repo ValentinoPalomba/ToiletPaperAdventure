@@ -9,8 +9,9 @@ struct PhysicsCategory {
     static let monster    : UInt32 = 0b1       // 1
     static let projectile : UInt32 = 0b10      // 2
     static let player     : UInt32 = 0b11
-    static let invincibilityMask : UInt32 = 0b01
-    static let projectile2 : UInt32 = 0b11
+    static let invincibilityMask : UInt32 = 0b100
+    static let projectile2 : UInt32 = 0b101
+    static let player     : UInt32 = 0b110
     
 }
 
